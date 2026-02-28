@@ -1,210 +1,107 @@
 const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcryptjs');
-
 const prisma = new PrismaClient();
 
 const dishes = [
-  {
-    name: 'Paneer Butter Masala',
-    description: 'Creamy tomato-based curry with soft paneer cubes, flavored with aromatic spices and fresh cream.',
-    price: 280,
-    imageUrl: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=600&auto=format&fit=crop',
-    category: 'Main Course',
-    rating: 4.8,
-    deliveryTime: 30,
-    isVeg: true,
-  },
-  {
-    name: 'Veg Biryani',
-    description: 'Fragrant basmati rice cooked with seasonal vegetables, saffron, and whole spices. Served with raita.',
-    price: 220,
-    imageUrl: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=600&auto=format&fit=crop',
-    category: 'Rice',
-    rating: 4.5,
-    deliveryTime: 35,
-    isVeg: true,
-  },
-  {
-    name: 'Masala Dosa',
-    description: 'Crispy golden dosa filled with spiced potato masala. Served with coconut chutney and sambar.',
-    price: 150,
-    imageUrl: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop',
-    category: 'South Indian',
-    rating: 4.6,
-    deliveryTime: 20,
-    isVeg: true,
-  },
-  {
-    name: 'Chole Bhature',
-    description: 'Spicy chickpea curry paired with fluffy deep-fried bread. A classic Punjabi street food combo.',
-    price: 180,
-    imageUrl: 'https://images.unsplash.com/photo-1626132647523-66f5bf380027?w=600&auto=format&fit=crop',
-    category: 'North Indian',
-    rating: 4.7,
-    deliveryTime: 25,
-    isVeg: true,
-  },
-  {
-    name: 'Dal Makhani',
-    description: 'Slow-cooked black lentils simmered overnight with butter, cream, and aromatic spices.',
-    price: 240,
-    imageUrl: 'https://images.unsplash.com/photo-1546833998-877b37c2e5c6?w=600&auto=format&fit=crop',
-    category: 'Main Course',
-    rating: 4.9,
-    deliveryTime: 30,
-    isVeg: true,
-  },
-  {
-    name: 'Chicken Tikka Masala',
-    description: 'Tender chicken marinated in yogurt and spices, grilled and served in rich tomato-cream sauce.',
-    price: 320,
-    imageUrl: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=600&auto=format&fit=crop',
-    category: 'Main Course',
-    rating: 4.8,
-    deliveryTime: 35,
-    isVeg: false,
-  },
-  {
-    name: 'Palak Paneer',
-    description: 'Fresh spinach puree cooked with cottage cheese, garlic, and mild spices. Healthy and delicious.',
-    price: 260,
-    imageUrl: 'https://images.unsplash.com/photo-1604152135912-04a022e23696?w=600&auto=format&fit=crop',
-    category: 'Main Course',
-    rating: 4.5,
-    deliveryTime: 25,
-    isVeg: true,
-  },
-  {
-    name: 'Pav Bhaji',
-    description: 'Mixed vegetable mash cooked in a tangy tomato base, served with buttered pav buns.',
-    price: 140,
-    imageUrl: 'https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=600&auto=format&fit=crop',
-    category: 'Street Food',
-    rating: 4.6,
-    deliveryTime: 20,
-    isVeg: true,
-  },
-  {
-    name: 'Butter Naan',
-    description: 'Soft leavened bread baked in a tandoor, brushed generously with butter and garlic.',
-    price: 60,
-    imageUrl: 'https://images.unsplash.com/photo-1614777986387-d1b7e3513c27?w=600&auto=format&fit=crop',
-    category: 'Breads',
-    rating: 4.4,
-    deliveryTime: 15,
-    isVeg: true,
-  },
-  {
-    name: 'Gulab Jamun',
-    description: 'Soft milk-solid dumplings soaked in rose-flavored sugar syrup. The perfect Indian dessert.',
-    price: 100,
-    imageUrl: 'https://images.unsplash.com/photo-1601303516534-bf5f3c96e58f?w=600&auto=format&fit=crop',
-    category: 'Desserts',
-    rating: 4.7,
-    deliveryTime: 15,
-    isVeg: true,
-  },
-  {
-    name: 'Chicken Biryani',
-    description: 'Aromatic basmati rice layered with tender chicken, caramelized onions, and saffron. Dum-cooked.',
-    price: 320,
-    imageUrl: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=600&auto=format&fit=crop',
-    category: 'Rice',
-    rating: 4.9,
-    deliveryTime: 40,
-    isVeg: false,
-  },
-  {
-    name: 'Aloo Tikki Chaat',
-    description: 'Crispy potato patties topped with tangy chutneys, yogurt, chaat masala, and pomegranate seeds.',
-    price: 120,
-    imageUrl: 'https://images.unsplash.com/photo-1625398407796-82650a8c135f?w=600&auto=format&fit=crop',
-    category: 'Street Food',
-    rating: 4.5,
-    deliveryTime: 20,
-    isVeg: true,
-  },
-  {
-    name: 'Mango Lassi',
-    description: 'Thick, creamy yogurt-based drink blended with fresh Alphonso mangoes and a hint of cardamom.',
-    price: 90,
-    imageUrl: 'https://images.unsplash.com/photo-1527324688151-0e627063f2b1?w=600&auto=format&fit=crop',
-    category: 'Beverages',
-    rating: 4.8,
-    deliveryTime: 10,
-    isVeg: true,
-  },
-  {
-    name: 'Tandoori Chicken',
-    description: 'Half chicken marinated in yogurt and spice blend, roasted in a traditional clay tandoor oven.',
-    price: 380,
-    imageUrl: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=600&auto=format&fit=crop',
-    category: 'Starters',
-    rating: 4.7,
-    deliveryTime: 30,
-    isVeg: false,
-  },
-  {
-    name: 'Samosa',
-    description: 'Golden, flaky pastry filled with spiced potatoes and peas. Served with mint and tamarind chutney.',
-    price: 50,
-    imageUrl: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&auto=format&fit=crop',
-    category: 'Starters',
-    rating: 4.6,
-    deliveryTime: 15,
-    isVeg: true,
-  },
+  // VEG STARTERS
+  { name: 'Paneer Tikka', description: 'Marinated cottage cheese grilled to perfection in a tandoor oven with aromatic spices.', price: 220, imageUrl: 'https://lentillovingfamily.com/wp-content/uploads/2025/08/paneer-tikka-2.jpg', category: 'Veg Starters', rating: 4.5, deliveryTime: 25, isVeg: true, isAvailable: true },
+  { name: 'Malai Paneer Tikka', description: 'Soft paneer cubes marinated in creamy malai and mild spices, grilled to a golden finish.', price: 250, imageUrl: 'https://candidtreat.com/wp-content/uploads/2022/12/Malai-paneer-tikka-scaled-1-958x575.jpeg', category: 'Veg Starters', rating: 4.6, deliveryTime: 25, isVeg: true, isAvailable: true },
+  { name: 'Hara Bhara Kabab', description: 'Crispy patties made from spinach, peas, and potatoes, packed with green goodness.', price: 180, imageUrl: 'https://carveyourcraving.com/wp-content/uploads/2024/03/hara-bhara-kebab_.jpg', category: 'Veg Starters', rating: 4.3, deliveryTime: 20, isVeg: true, isAvailable: true },
+  { name: 'Veg Spring Rolls', description: 'Crispy golden rolls stuffed with fresh vegetables and served with tangy dipping sauce.', price: 160, imageUrl: 'https://d1mxd7n691o8sz.cloudfront.net/static/recipe/recipe/2023-12/Vegetable-Spring-Rolls-2-1-906001560ca545c8bc72baf473f230b4.jpg', category: 'Veg Starters', rating: 4.2, deliveryTime: 20, isVeg: true, isAvailable: true },
+  { name: 'Chilli Paneer', description: 'Crispy fried paneer tossed in a spicy Indo-Chinese sauce with peppers and onions.', price: 230, imageUrl: 'https://www.indianhealthyrecipes.com/wp-content/uploads/2022/02/chilli-paneer-recipe.jpg', category: 'Veg Starters', rating: 4.5, deliveryTime: 25, isVeg: true, isAvailable: true },
+  { name: 'Crispy Corn', description: 'Sweet corn kernels fried to a crispy perfection and tossed with spices and herbs.', price: 150, imageUrl: 'https://www.indianhealthyrecipes.com/wp-content/uploads/2023/09/crispy-corn.webp', category: 'Veg Starters', rating: 4.4, deliveryTime: 15, isVeg: true, isAvailable: true },
+  { name: 'Dahi Ke Kebab', description: 'Melt-in-mouth kebabs made from hung curd and spices, pan-fried to golden perfection.', price: 200, imageUrl: 'https://images.archanaskitchen.com/images/recipes/snack-recipes/indian-snack-recipes/Dahi_Ke_Kebab_Recipe_Greek_Yogurt_Kebabs_Mughlai_Cuisine_1_8515e5469b.jpg', category: 'Veg Starters', rating: 4.4, deliveryTime: 20, isVeg: true, isAvailable: true },
+  { name: 'Stuffed Mushrooms', description: 'Fresh mushrooms stuffed with a savory filling of cheese and herbs, baked to perfection.', price: 210, imageUrl: 'https://natashaskitchen.com/wp-content/uploads/2023/12/stuffed-mushrooms-sq.jpg', category: 'Veg Starters', rating: 4.3, deliveryTime: 20, isVeg: true, isAvailable: true },
+
+  // MOMOS & CHINESE
+  { name: 'Steamed Veg Momos', description: 'Soft steamed dumplings filled with spiced vegetables, served with spicy red chutney.', price: 120, imageUrl: 'https://delishglobe.com/wp-content/uploads/2025/05/Nepalese-Momo.png', category: 'Momos & Chinese', rating: 4.5, deliveryTime: 20, isVeg: true, isAvailable: true },
+  { name: 'Fried Veg Momos', description: 'Crispy fried dumplings packed with spiced vegetables, best with hot garlic sauce.', price: 140, imageUrl: 'https://vegecravings.com/wp-content/uploads/2021/02/Fried-Momos-Recipe-Step-By-Step-Instructions-500x500.jpg', category: 'Momos & Chinese', rating: 4.6, deliveryTime: 20, isVeg: true, isAvailable: true },
+  { name: 'Veg Hakka Noodles', description: 'Stir-fried noodles with fresh vegetables in a savory Indo-Chinese sauce.', price: 160, imageUrl: 'https://shwetainthekitchen.com/wp-content/uploads/2020/07/IMG_0100.jpg', category: 'Momos & Chinese', rating: 4.3, deliveryTime: 25, isVeg: true, isAvailable: true },
+  { name: 'Veg Fried Rice', description: 'Fragrant wok-tossed rice with colorful vegetables and soy sauce.', price: 150, imageUrl: 'https://www.whiskaffair.com/wp-content/uploads/2018/11/Vegetable-Fried-Rice-2-3.jpg', category: 'Momos & Chinese', rating: 4.2, deliveryTime: 25, isVeg: true, isAvailable: true },
+  { name: 'Gobi Manchurian', description: 'Crispy cauliflower florets in a tangy spicy Manchurian sauce, a street food favorite.', price: 170, imageUrl: 'https://www.indianveggiedelight.com/wp-content/uploads/2017/06/gobi-manchurian-featured.jpg', category: 'Momos & Chinese', rating: 4.4, deliveryTime: 25, isVeg: true, isAvailable: true },
+  { name: 'Schezwan Noodles', description: 'Spicy stir-fried noodles with vegetables in bold schezwan sauce.', price: 170, imageUrl: 'https://instamart-media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,h_960,w_960//InstamartAssets/schezwan_noodles.webp', category: 'Momos & Chinese', rating: 4.3, deliveryTime: 25, isVeg: true, isAvailable: true },
+
+  // PIZZA
+  { name: 'Margherita', description: 'Classic pizza with tangy tomato sauce, fresh mozzarella and basil on a crispy base.', price: 200, imageUrl: 'https://www.vindulge.com/wp-content/uploads/2022/05/Margherita-Pizza.jpg', category: 'Pizza', rating: 4.4, deliveryTime: 30, isVeg: true, isAvailable: true },
+  { name: 'Farmhouse Pizza', description: 'Loaded with fresh farm vegetables on a cheesy base, a wholesome treat.', price: 260, imageUrl: 'https://media-assets.swiggy.com/swiggy/image/upload/f_auto,q_auto,fl_lossy/f9701b4e9e6aae4febe5e52c9f5e36f9', category: 'Pizza', rating: 4.3, deliveryTime: 30, isVeg: true, isAvailable: true },
+  { name: 'Paneer Tikka Pizza', description: 'Indian fusion pizza topped with tandoori paneer tikka and spiced sauce.', price: 290, imageUrl: 'https://i.pinimg.com/564x/76/42/b9/7642b9241623cf0363eeff86b4ade51e.jpg', category: 'Pizza', rating: 4.5, deliveryTime: 30, isVeg: true, isAvailable: true },
+  { name: 'Veggie Supreme', description: 'Loaded with colorful veggies on a cheesy base for the ultimate veg pizza experience.', price: 280, imageUrl: 'https://s3-ap-south-1.amazonaws.com/betterbutterbucket-silver/shaheen-ali20170510144238021.jpeg', category: 'Pizza', rating: 4.4, deliveryTime: 30, isVeg: true, isAvailable: true },
+  { name: 'Cheese Burst', description: 'Oozing with cheese inside and out, this pizza is the ultimate cheese lover delight.', price: 320, imageUrl: 'https://cdn.uengage.io/uploads/5/image-767221-1752218754.jpeg', category: 'Pizza', rating: 4.6, deliveryTime: 30, isVeg: true, isAvailable: true },
+  { name: 'Corn & Cheese Pizza', description: 'Sweet corn and melted cheese on a crispy base, a crowd-pleasing classic.', price: 250, imageUrl: 'https://bakesquare.in/wp-content/uploads/2023/04/5qgpBjIyHm4XLzDk1OHleamgDNKt6nbSm-nv73i4k7eDDyq5mh5DV0awva1cF6ptuA5lVCB96VnjN93xLE06qfEebGwnPHwKwpNh.jpg', category: 'Pizza', rating: 4.3, deliveryTime: 30, isVeg: true, isAvailable: true },
+
+  // BURGERS & WRAPS
+  { name: 'Classic Veg Burger', description: 'Crispy veg patty with fresh lettuce, tomato and sauce in a soft sesame bun.', price: 120, imageUrl: 'https://5.imimg.com/data5/YR/NQ/GLADMIN-51056631/big-crunch-veg-classic-burger.png', category: 'Burgers & Wraps', rating: 4.2, deliveryTime: 20, isVeg: true, isAvailable: true },
+  { name: 'Cheese Corn Burger', description: 'Juicy corn and cheese patty loaded with toppings in a toasted bun.', price: 150, imageUrl: 'https://kitchen-gallery.co.in/wp-content/uploads/2025/09/p11.jpg', category: 'Burgers & Wraps', rating: 4.3, deliveryTime: 20, isVeg: true, isAvailable: true },
+  { name: 'Paneer Wrap', description: 'Soft flatbread wrapped with spiced paneer, veggies and tangy chutney.', price: 160, imageUrl: 'https://www.chefkunalkapur.com/wp-content/uploads/2022/03/paneer-kulcha-roll-scaled.jpg', category: 'Burgers & Wraps', rating: 4.4, deliveryTime: 20, isVeg: true, isAvailable: true },
+  { name: 'Veg Frankie', description: 'Spicy vegetable filling rolled in a soft roti with chutneys, a Mumbai classic.', price: 100, imageUrl: 'https://i0.wp.com/myvegetarianroots.com/wp-content/uploads/2019/09/DSC_0016-2.jpg', category: 'Burgers & Wraps', rating: 4.3, deliveryTime: 15, isVeg: true, isAvailable: true },
+  { name: 'Grilled Veg Wrap', description: 'Grilled vegetables and hummus wrapped in a toasted tortilla, healthy and delicious.', price: 160, imageUrl: 'https://diabetesstrong.com/wp-content/uploads/2021/10/grilled-veggie-wraps-8.jpg', category: 'Burgers & Wraps', rating: 4.3, deliveryTime: 20, isVeg: true, isAvailable: true },
+
+  // VEG MAIN COURSE
+  { name: 'Shahi Paneer', description: 'Rich and creamy paneer curry in a royal Mughlai gravy with aromatic spices.', price: 280, imageUrl: 'https://tiffinandteaofficial.com/wp-content/uploads/2020/07/Untitled-1.jpg', category: 'Main Course', rating: 4.7, deliveryTime: 30, isVeg: true, isAvailable: true },
+  { name: 'Kadai Paneer', description: 'Paneer and peppers cooked in a spicy kadai masala, bursting with bold flavors.', price: 270, imageUrl: 'https://www.indianhealthyrecipes.com/wp-content/uploads/2022/04/kadai-paneer-recipe.jpg', category: 'Main Course', rating: 4.6, deliveryTime: 30, isVeg: true, isAvailable: true },
+  { name: 'Palak Paneer', description: 'Soft paneer cubes in creamy spinach gravy, a healthy and wholesome classic.', price: 260, imageUrl: 'https://www.indianhealthyrecipes.com/wp-content/uploads/2022/04/palak-paneer-recipe.jpg', category: 'Main Course', rating: 4.5, deliveryTime: 30, isVeg: true, isAvailable: true },
+  { name: 'Dal Makhani', description: 'Slow-cooked black lentils in a rich buttery tomato gravy, a North Indian icon.', price: 240, imageUrl: 'https://sinfullyspicy.com/wp-content/uploads/2015/03/1200-by-1200-images-1.jpg', category: 'Main Course', rating: 4.8, deliveryTime: 35, isVeg: true, isAvailable: true },
+  { name: 'Dal Tadka', description: 'Yellow lentils tempered with ghee, cumin and aromatic spices, comfort food at its best.', price: 180, imageUrl: 'https://www.indianhealthyrecipes.com/wp-content/uploads/2021/04/dal-tadka-recipe-500x500.jpg', category: 'Main Course', rating: 4.4, deliveryTime: 25, isVeg: true, isAvailable: true },
+  { name: 'Mix Veg Curry', description: 'A medley of fresh seasonal vegetables slow-cooked in a spiced onion-tomato gravy.', price: 220, imageUrl: 'https://www.indianhealthyrecipes.com/wp-content/uploads/2023/07/vegetable-curry-recipe.jpg', category: 'Main Course', rating: 4.3, deliveryTime: 30, isVeg: true, isAvailable: true },
+  { name: 'Veg Kolhapuri', description: 'Fiery mixed vegetable curry from Kolhapur with bold Maharashtrian spices.', price: 240, imageUrl: 'https://www.cookingcarnival.com/wp-content/uploads/2015/05/Veg-Kolhapuri-4.jpg', category: 'Main Course', rating: 4.4, deliveryTime: 30, isVeg: true, isAvailable: true },
+  { name: 'Jeera Rice', description: 'Fragrant basmati rice tempered with cumin, ghee and whole spices.', price: 120, imageUrl: 'https://delishbite.in/wp-content/uploads/2023/07/Blog_1-3-500x500.jpg', category: 'Main Course', rating: 4.3, deliveryTime: 20, isVeg: true, isAvailable: true },
+  { name: 'Veg Pulao', description: 'Aromatic basmati rice cooked with mixed vegetables and whole spices.', price: 150, imageUrl: 'https://www.funfoodfrolic.com/wp-content/uploads/2022/05/Veg-Pulao-Blog.jpg', category: 'Main Course', rating: 4.4, deliveryTime: 25, isVeg: true, isAvailable: true },
+
+  // NON-VEG STARTERS
+  { name: 'Chicken Tikka', description: 'Juicy chicken marinated in yogurt and spices, char-grilled in a tandoor oven.', price: 280, imageUrl: 'https://www.whiskaffair.com/wp-content/uploads/2020/06/Chicken-Tikka-2-3.jpg', category: 'Non-Veg Starters', rating: 4.7, deliveryTime: 25, isVeg: false, isAvailable: true },
+  { name: 'Malai Chicken Tikka', description: 'Tender chicken in a creamy malai marinade, grilled to melt-in-mouth perfection.', price: 300, imageUrl: 'https://nodashofgluten.com/wp-content/uploads/2025/02/Chicken-Malai-Tikka-Recipe-1.png.webp', category: 'Non-Veg Starters', rating: 4.8, deliveryTime: 25, isVeg: false, isAvailable: true },
+  { name: 'Chicken Seekh Kebab', description: 'Minced chicken mixed with spices, skewered and grilled over charcoal.', price: 270, imageUrl: 'https://spicecravings.com/wp-content/uploads/2021/03/Chicken-Seekh-Kebab-Featured-1.jpg', category: 'Non-Veg Starters', rating: 4.6, deliveryTime: 25, isVeg: false, isAvailable: true },
+  { name: 'Chicken Lollipop', description: 'Crunchy chicken lollipops marinated in bold spices, deep-fried to golden crisp.', price: 260, imageUrl: 'https://overthefirecooking.com/wp-content/uploads/2022/10/A_IMG_5877-2.jpg', category: 'Non-Veg Starters', rating: 4.5, deliveryTime: 25, isVeg: false, isAvailable: true },
+  { name: 'Chilli Chicken', description: 'Crispy chicken pieces tossed in spicy Indo-Chinese sauce with onions and peppers.', price: 260, imageUrl: 'https://www.licious.in/blog/wp-content/uploads/2022/04/shutterstock_1498639676-min.jpg', category: 'Non-Veg Starters', rating: 4.6, deliveryTime: 25, isVeg: false, isAvailable: true },
+  { name: 'Fish Amritsari', description: 'Flaky fish coated in a spiced chickpea batter, deep-fried Punjabi style.', price: 290, imageUrl: 'https://sinfullyspicy.com/wp-content/uploads/2022/07/1200-by-1200-images-5.jpg', category: 'Non-Veg Starters', rating: 4.5, deliveryTime: 30, isVeg: false, isAvailable: true },
+  { name: 'Prawns Fry', description: 'Crispy fried prawns marinated in coastal spices, served with mint chutney.', price: 320, imageUrl: 'https://www.licious.in/blog/wp-content/uploads/2022/04/shutterstock_1498639676-min.jpg', category: 'Non-Veg Starters', rating: 4.6, deliveryTime: 30, isVeg: false, isAvailable: true },
+
+  // NON-VEG MAIN COURSE
+  { name: 'Butter Chicken', description: 'Succulent chicken in a rich, velvety tomato-butter sauce. A timeless classic.', price: 320, imageUrl: 'https://images.immediate.co.uk/production/volatile/sites/30/2021/02/butter-chicken-ac2ff98.jpg', category: 'Main Course', rating: 4.8, deliveryTime: 35, isVeg: false, isAvailable: true },
+  { name: 'Chicken Curry', description: 'Tender chicken pieces slow-cooked in a spicy onion-tomato masala gravy.', price: 280, imageUrl: 'https://www.foodandwine.com/thmb/8YAIANQTZnGpVWj2XgY0dYH1V4I=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/spicy-chicken-curry-FT-RECIPE0321-58f84fdf7b484e7f86894203eb7834e7.jpg', category: 'Main Course', rating: 4.6, deliveryTime: 35, isVeg: false, isAvailable: true },
+  { name: 'Chicken Korma', description: 'Mild and aromatic chicken curry in a rich nutty yogurt-based gravy.', price: 300, imageUrl: 'https://i.ndtvimg.com/i/2016-10/chicken-korma_650x400_51475662188.jpg', category: 'Main Course', rating: 4.5, deliveryTime: 35, isVeg: false, isAvailable: true },
+  { name: 'Mutton Rogan Josh', description: 'Tender mutton cooked in a robust Kashmiri spice blend, slow-braised to perfection.', price: 380, imageUrl: 'https://static.toiimg.com/thumb/53192600.cms?imgsize=418831&width=800&height=800', category: 'Main Course', rating: 4.7, deliveryTime: 45, isVeg: false, isAvailable: true },
+  { name: 'Egg Curry', description: 'Boiled eggs simmered in a spicy onion-tomato masala, a simple yet satisfying dish.', price: 180, imageUrl: 'https://www.spicebangla.com/wp-content/uploads/2024/08/Egg-Masala-Curry.webp', category: 'Main Course', rating: 4.3, deliveryTime: 25, isVeg: false, isAvailable: true },
+
+  // RICE / BIRYANI
+  { name: 'Chicken Biryani', description: 'Aromatic basmati rice layered with tender chicken, caramelized onions and saffron.', price: 320, imageUrl: 'https://www.cubesnjuliennes.com/wp-content/uploads/2020/07/Chicken-Biryani-Recipe.jpg', category: 'Rice & Biryani', rating: 4.9, deliveryTime: 40, isVeg: false, isAvailable: true },
+  { name: 'Mutton Biryani', description: 'Slow-cooked mutton layered with fragrant basmati rice and whole spices.', price: 380, imageUrl: 'https://www.cubesnjuliennes.com/wp-content/uploads/2021/03/Best-Mutton-Biryani-Recipe.jpg', category: 'Rice & Biryani', rating: 4.8, deliveryTime: 45, isVeg: false, isAvailable: true },
+  { name: 'Egg Biryani', description: 'Fragrant biryani rice layered with spiced boiled eggs and caramelized onions.', price: 220, imageUrl: 'https://www.pavaniskitchen.com/wp-content/uploads/2021/04/egg-biryani-recipe.jpg', category: 'Rice & Biryani', rating: 4.4, deliveryTime: 35, isVeg: false, isAvailable: true },
+
+  // PASTA
+  { name: 'White Sauce Pasta', description: 'Creamy bechamel sauce pasta with herbs and parmesan, rich and indulgent.', price: 200, imageUrl: 'https://www.cookwithkushi.com/wp-content/uploads/2016/07/best_white_sauce_pasta_bechamel_sauce.jpg', category: 'Pasta', rating: 4.3, deliveryTime: 25, isVeg: true, isAvailable: true },
+  { name: 'Red Sauce Pasta', description: 'Al dente pasta in a tangy tomato-basil sauce with Italian herbs.', price: 190, imageUrl: 'https://www.kimscravings.com/wp-content/uploads/2022/12/creamy-pasta-sauce-recipe-featured.jpg', category: 'Pasta', rating: 4.2, deliveryTime: 25, isVeg: true, isAvailable: true },
+  { name: 'Penne Alfredo', description: 'Classic penne pasta tossed in a rich, creamy alfredo sauce with parmesan.', price: 220, imageUrl: 'https://fedbysab.com/wp-content/uploads/2023/01/Chicken-Alfredo-Bake-Recipe.jpg', category: 'Pasta', rating: 4.3, deliveryTime: 25, isVeg: true, isAvailable: true },
+  { name: 'Chicken White Sauce Pasta', description: 'Tender chicken pieces tossed in a creamy white sauce with penne pasta.', price: 260, imageUrl: 'https://www.tasteofhome.com/wp-content/uploads/2018/01/Creamy-Chicken-and-Pasta_EXPS_FT24_26216_JR_0315_1.jpg', category: 'Pasta', rating: 4.5, deliveryTime: 30, isVeg: false, isAvailable: true },
+  { name: 'Chicken Arrabiata', description: 'Spicy chicken in a bold arrabbiata tomato sauce tossed with penne pasta.', price: 270, imageUrl: 'https://www.saltandlavender.com/wp-content/uploads/2022/06/chicken-arrabiata-1.jpg', category: 'Pasta', rating: 4.4, deliveryTime: 30, isVeg: false, isAvailable: true },
+
+  // DESSERTS
+  { name: 'Brownie with Ice Cream', description: 'Warm fudgy chocolate brownie served with a scoop of vanilla ice cream.', price: 160, imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJSSyBvhNnKZ9D1Rgj-6_WHMXFlR1HE7jkCA&s', category: 'Desserts', rating: 4.7, deliveryTime: 15, isVeg: true, isAvailable: true },
+  { name: 'Chocolate Lava Cake', description: 'Decadent chocolate cake with a warm molten center, served with ice cream.', price: 180, imageUrl: 'https://images.getrecipekit.com/20250325120225-how-20to-20make-20chocolate-20molten-20lava-20cake-20in-20the-20microwave.png', category: 'Desserts', rating: 4.8, deliveryTime: 20, isVeg: true, isAvailable: true },
+  { name: 'Gulab Jamun', description: 'Soft milk-solid dumplings soaked in rose-flavored sugar syrup, a beloved Indian sweet.', price: 100, imageUrl: 'https://www.cadburydessertscorner.com/hubfs/dc-website-2022/articles/soft-gulab-jamun-recipe-for-raksha-bandhan-from-dough-to-syrup-all-you-need-to-know/soft-gulab-jamun-recipe-for-raksha-bandhan-from-dough-to-syrup-all-you-need-to-know.webp', category: 'Desserts', rating: 4.6, deliveryTime: 10, isVeg: true, isAvailable: true },
+  { name: 'Rasmalai', description: 'Soft cottage cheese dumplings soaked in sweetened saffron-cardamom milk.', price: 120, imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXa6O9xpr1i3EEgRPvYyLU7CGBT7wnx5hl8A&s', category: 'Desserts', rating: 4.7, deliveryTime: 10, isVeg: true, isAvailable: true },
+  { name: 'Strawberry Ice Cream', description: 'Creamy homemade strawberry ice cream bursting with fresh berry flavor.', price: 90, imageUrl: 'https://www.thecountrycook.net/wp-content/uploads/2022/05/thumbnail-No-Churn-Strawberry-Ice-Cream-500x500.jpg', category: 'Desserts', rating: 4.5, deliveryTime: 10, isVeg: true, isAvailable: true },
+  { name: 'New York Cheesecake', description: 'Classic dense and creamy New York style cheesecake on a buttery graham cracker crust.', price: 200, imageUrl: 'https://www.allrecipes.com/thmb/R4reoZMOwUpDh9SJnc5xgRYH4No=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/221142-new-york-style-cheesecake-VAT-Beauty-2x1-4d4d4be1f12b4473ae748387fff54290.jpg', category: 'Desserts', rating: 4.6, deliveryTime: 10, isVeg: true, isAvailable: true },
+
+  // BEVERAGES
+  { name: 'Cold Coffee', description: 'Chilled blended coffee with ice cream, a refreshing cafe-style drink.', price: 100, imageUrl: 'https://mytastycurry.com/wp-content/uploads/2020/04/Cafe-style-cold-coffee-with-icecream.jpg', category: 'Beverages', rating: 4.5, deliveryTime: 10, isVeg: true, isAvailable: true },
+  { name: 'Chocolate Shake', description: 'Rich and creamy chocolate milkshake blended with premium chocolate ice cream.', price: 120, imageUrl: 'https://cookilicious.com/wp-content/uploads/2025/01/Brownie-Milkshake-Recipe-20-scaled.jpg', category: 'Beverages', rating: 4.4, deliveryTime: 10, isVeg: true, isAvailable: true },
+  { name: 'Oreo Shake', description: 'Thick and creamy milkshake blended with Oreo cookies and vanilla ice cream.', price: 130, imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgB6D17qtlr1DOisCc_8LJtmUIZt1xVhDZwg&s', category: 'Beverages', rating: 4.5, deliveryTime: 10, isVeg: true, isAvailable: true },
+  { name: 'Masala Chaas', description: 'Refreshing spiced buttermilk with cumin, ginger and fresh coriander leaves.', price: 60, imageUrl: 'https://www.indianveggiedelight.com/wp-content/uploads/2023/01/masala-chaas-featured.jpg', category: 'Beverages', rating: 4.3, deliveryTime: 10, isVeg: true, isAvailable: true },
+  { name: 'Pepsi', description: 'Chilled Pepsi to quench your thirst and refresh you instantly.', price: 40, imageUrl: 'https://m.economictimes.com/thumb/height-450,width-600,imgsize-154309,msid-69353239/coke-pepsi-getty.jpg', category: 'Beverages', rating: 4.0, deliveryTime: 5, isVeg: true, isAvailable: true },
+  { name: 'Mineral Water', description: 'Pure chilled mineral water to keep you hydrated.', price: 20, imageUrl: 'https://nevas.in/wp-content/uploads/2025/05/Nevas_Mineral-water-Bottle-750-ML-2-1024x1024.jpg', category: 'Beverages', rating: 4.0, deliveryTime: 5, isVeg: true, isAvailable: true },
 ];
 
 async function main() {
-  console.log('🌱 Starting seed...');
-
-  // Create admin user
-  const hashedPassword = await bcrypt.hash('admin123', 10);
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@foodapp.com' },
-    update: {},
-    create: {
-      name: 'Admin User',
-      email: 'admin@foodapp.com',
-      password: hashedPassword,
-      role: 'ADMIN',
-    },
-  });
-  console.log('✅ Admin user created:', admin.email);
-
-  // Create test user
-  const userPassword = await bcrypt.hash('user123', 10);
-  const user = await prisma.user.upsert({
-    where: { email: 'user@foodapp.com' },
-    update: {},
-    create: {
-      name: 'Test User',
-      email: 'user@foodapp.com',
-      password: userPassword,
-      role: 'USER',
-    },
-  });
-  console.log('✅ Test user created:', user.email);
-
-  // Create dishes
+  console.log('Deleting existing data...');
+  await prisma.orderItem.deleteMany({});
+  await prisma.order.deleteMany({});
+  await prisma.dish.deleteMany({});
+  console.log('Seeding dishes...');
   for (const dish of dishes) {
-    await prisma.dish.upsert({
-      where: { id: dish.name.toLowerCase().replace(/\s+/g, '-') },
-      update: dish,
-      create: { id: dish.name.toLowerCase().replace(/\s+/g, '-'), ...dish },
-    });
+    await prisma.dish.create({ data: dish });
+    process.stdout.write('.');
   }
-  console.log(`✅ ${dishes.length} dishes seeded`);
-
-  console.log('🎉 Seed completed!');
+  console.log(`\nDone! Seeded ${dishes.length} dishes.`);
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+main().catch(console.error).finally(() => prisma.$disconnect());

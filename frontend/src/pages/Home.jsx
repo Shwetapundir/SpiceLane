@@ -6,13 +6,14 @@ import { Clock, Star } from 'lucide-react';
 
 const CATEGORIES = [
   { label: 'All', emoji: '🍽️' },
-  { label: 'Starters', emoji: '🥗' },
+  { label: 'Veg Starters', emoji: '🥗' },
+  { label: 'Non-Veg Starters', emoji: '🍗' },
+  { label: 'Momos & Chinese', emoji: '🥟' },
+  { label: 'Pizza', emoji: '🍕' },
+  { label: 'Burgers & Wraps', emoji: '🍔' },
   { label: 'Main Course', emoji: '🍛' },
-  { label: 'Breads', emoji: '🫓' },
-  { label: 'Rice', emoji: '🍚' },
-  { label: 'South Indian', emoji: '🥘' },
-  { label: 'North Indian', emoji: '🫕' },
-  { label: 'Street Food', emoji: '🌯' },
+  { label: 'Rice & Biryani', emoji: '🍚' },
+  { label: 'Pasta', emoji: '🍝' },
   { label: 'Desserts', emoji: '🍮' },
   { label: 'Beverages', emoji: '🥤' },
 ];
