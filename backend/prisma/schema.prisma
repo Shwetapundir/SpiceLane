@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+
+  @@map("users")
+}
+
+model Dish {
+  id           String      @id @default(cuid())
+  name         String
+  description  String
+  price        Decimal     @db.Decimal(10, 2)
+  imageUrl     String
+  category     String
+  rating       Decimal     @db.Decimal(3, 2) @default(4.0)
+  deliveryTime Int         @default(30)
+  isAvailable  Boolean     @default(true)
+  isVeg        Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  orderItems   OrderItem[]
+
+  @@map("dishes")
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
+  items           OrderItem[]
+  subtotal        Decimal     @db.Decimal(10, 2)
+  deliveryCharge  Decimal     @db.Decimal(10, 2)
+  platformFee     Decimal     @db.Decimal(10, 2)
+  gst             Decimal     @db.Decimal(10, 2)
+  total           Decimal     @db.Decimal(10, 2)
+  status          OrderStatus @default(PENDING)
+  stripeSessionId String?     @unique
+  address         String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id       String  @id @default(cuid())
+  orderId  String
+  order    Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  dishId   String
+  dish     Dish    @relation(fields: [dishId], references: [id])
+  quantity Int
+  price    Decimal @db.Decimal(10, 2)
+  name     String
+
+  @@map("order_items")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
