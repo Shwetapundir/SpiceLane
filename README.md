@@ -1,8 +1,9 @@
 # 🍛 FoodApp — Production-Ready Food Ordering Platform
 
-A full-stack food ordering web application inspired by Zomato/Swiggy, built with React + Node.js + PostgreSQL + Stripe.
+A full-stack food ordering web application .
 ---
 📁 Complete Project Structure
+
 foodapp/
 ├── backend/
 │   ├── prisma/
