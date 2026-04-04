@@ -41,8 +41,8 @@ export const orderAPI = {
 };
 
 export const paymentAPI = {
-  createPaymentIntent: (data) => api.post('/payment/create', data),
-  verifyPayment: (data) => api.post('/payment/verify', data),
+  createCheckoutSession: (data) => api.post('/payment/checkout-session', data),
+  verifySession: (sessionId) => api.get(`/payment/verify/${sessionId}`),
 };
 
 export const adminAPI = {

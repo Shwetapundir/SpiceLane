@@ -8,7 +8,8 @@ const API = axios.create();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token') || null);
-  const [isAdmin, setIsAdmin] = useState(false); // 👈 added
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
 
   // Auto-login if token exists on page refresh
   useEffect(() => {
@@ -18,8 +19,9 @@ export const AuthProvider = ({ children }) => {
       const parsedUser = JSON.parse(storedUser);
       setToken(storedToken);
       setUser(parsedUser);
-      setIsAdmin(parsedUser.isAdmin || false); // 👈 restore isAdmin
+      setIsAdmin(parsedUser.isAdmin || false);
     }
+    setAuthLoading(false);
   }, []);
 
   const register = async (formData) => {
@@ -49,7 +51,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isAdmin, register, login, logout }}>
+    <AuthContext.Provider value={{ user, token, isAdmin, authLoading, register, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

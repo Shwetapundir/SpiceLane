@@ -2,12 +2,12 @@ const prisma = require('../config/prisma');
 
 const getAllDishes = async (req, res, next) => {
   try {
-    const { category, search, page = 1, limit = 20 } = req.query;
+    const { isVeg ,category, search, page = 1, limit = 20 } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
-
     const where = { isAvailable: true };
     if (category && category !== 'all') where.category = category;
     if (search) where.name = { contains: search, mode: 'insensitive' };
+    if(isVeg) where.isVeg=JSON.parse(isVeg)
 
     const [dishes, total] = await Promise.all([
       prisma.dish.findMany({ where, skip, take: parseInt(limit), orderBy: { createdAt: 'asc' } }),

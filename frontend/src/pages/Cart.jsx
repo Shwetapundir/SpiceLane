@@ -20,20 +20,18 @@ export default function CartPage() {
     }
     try {
       setCheckingOut(true);
-      console.log('Sending amount:', total); // 👈 debug
-      const res = await paymentAPI.createPaymentIntent({ amount: total });
-      console.log('Payment response:', res.data); // 👈 debug
-
-      if (res.data?.success) {
-        toast.success('Payment successful!');
-        navigate('/order-success');
-      } else {
-        toast.error('Could not initiate checkout');
-        setCheckingOut(false);
-      }
+      const res = await paymentAPI.createCheckoutSession({
+        items: items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, imageUrl: i.imageUrl })),
+        subtotal,
+        deliveryCharge,
+        platformFee,
+        gst,
+        total,
+      });
+      // Redirect to Stripe Checkout
+      window.location.href = res.data.url;
     } catch (err) {
-      console.error('Payment error:', err.response?.data); // 👈 debug
-      toast.error(err.response?.data?.message || 'Checkout failed');
+      toast.error(err.response?.data?.error || 'Checkout failed');
       setCheckingOut(false);
     }
   };

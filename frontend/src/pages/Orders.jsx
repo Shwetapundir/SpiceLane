@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 
+const STATUS_LABELS = {
+  PENDING: 'Pending',
+  CONFIRMED: 'Confirmed ✓',
+  PREPARING: 'Preparing',
+  OUT_FOR_DELIVERY: 'Out for Delivery',
+  DELIVERED: 'Delivered',
+  CANCELLED: 'Cancelled',
+};
+
 const formatDate = (d) =>
   new Date(d).toLocaleString('en-IN', {
     day: 'numeric',
@@ -75,7 +84,7 @@ const OrdersPage = () => {
                     </div>
                   </div>
                   <span className={`order-status status-${order.status}`}>
-                    {order.status.replace(/_/g, ' ')}
+                    {STATUS_LABELS[order.status] || order.status.replace(/_/g, ' ')}
                   </span>
                 </div>
 
@@ -86,6 +95,8 @@ const OrdersPage = () => {
                         <img
                           src={item.dish?.imageUrl}
                           alt={item.dish?.name || item.name}
+                          style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }}
+                          onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=96&h=96&fit=crop'; }}
                         />
                       </div>
                       <div className="order-dish-name">

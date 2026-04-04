@@ -1,13 +1,13 @@
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
-import { paymentAPI, orderAPI } from '../../services/api';
+import { paymentAPI } from '../../services/api';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { X, ShoppingCart, Plus, Minus, Trash2, ChevronRight } from 'lucide-react';
 
 export default function CartSidebar() {
-  const { items, totalItems, subtotal, deliveryCharge, platformFee, gst, total, updateQuantity, removeItem, isCartOpen, setIsCartOpen, clearCart } = useCart();
+  const { items, totalItems, subtotal, deliveryCharge, platformFee, gst, total, updateQuantity, isCartOpen, setIsCartOpen } = useCart();
   const { user } = useAuth();
   const [checkingOut, setCheckingOut] = useState(false);
   const navigate = useNavigate();
@@ -25,21 +25,18 @@ export default function CartSidebar() {
     }
     try {
       setCheckingOut(true);
-      await paymentAPI.createPaymentIntent({ amount: total });
-      await orderAPI.createOrder({
-        items,
-        totalAmount: subtotal,
+      const res = await paymentAPI.createCheckoutSession({
+        items: items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, imageUrl: i.imageUrl })),
+        subtotal,
         deliveryCharge,
         platformFee,
         gst,
-        grandTotal: total,
+        total,
       });
-      clearCart();
-      toast.success('Payment successful!');
-      setIsCartOpen(false);
-      navigate('/order-success');
+      // Redirect to Stripe Checkout page
+      window.location.href = res.data.url;
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Checkout failed');
+      toast.error(err.response?.data?.error || 'Checkout failed');
       setCheckingOut(false);
     }
   };

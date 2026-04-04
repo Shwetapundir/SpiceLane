@@ -2,7 +2,7 @@ const stripe = require('../config/stripe');
 const prisma = require('../config/prisma');
 const logger = require('../config/logger');
 
-const createCheckoutSession = async (req, res, next) => {
+const createCheckoutSession = async (req, res) => {
   try {
     const { items, subtotal, deliveryCharge, platformFee, gst, total } = req.body;
 
@@ -10,27 +10,43 @@ const createCheckoutSession = async (req, res, next) => {
       return res.status(400).json({ error: 'Cart is empty' });
     }
 
-    const lineItems = items.map(item => ({
-      price_data: {
-        currency: 'inr',
-        product_data: {
-          name: item.name,
-          images: item.imageUrl ? [item.imageUrl] : [],
+    const lineItems = items.map(item => {
+      // Stripe only accepts valid HTTPS image URLs
+      const isValidHttpsUrl = (url) => {
+        try { const u = new URL(url); return u.protocol === 'https:'; } catch { return false; }
+      };
+      return {
+        price_data: {
+          currency: 'inr',
+          product_data: {
+            name: item.name,
+            ...(item.imageUrl && isValidHttpsUrl(item.imageUrl) ? { images: [item.imageUrl] } : {}),
+          },
+          unit_amount: Math.round(parseFloat(item.price) * 100),
         },
-        unit_amount: Math.round(parseFloat(item.price) * 100),
-      },
-      quantity: item.quantity,
-    }));
-
-    // Add fees as separate line items
-    lineItems.push({
-      price_data: {
-        currency: 'inr',
-        product_data: { name: 'Delivery + Platform Fee + GST' },
-        unit_amount: Math.round((parseFloat(deliveryCharge) + parseFloat(platformFee) + parseFloat(gst)) * 100),
-      },
-      quantity: 1,
+        quantity: item.quantity,
+      };
     });
+
+    const feesTotal = parseFloat(deliveryCharge) + parseFloat(platformFee) + parseFloat(gst);
+    if (feesTotal > 0) {
+      lineItems.push({
+        price_data: {
+          currency: 'inr',
+          product_data: { name: 'Delivery + Platform Fee + GST' },
+          unit_amount: Math.round(feesTotal * 100),
+        },
+        quantity: 1,
+      });
+    }
+
+    // Stripe metadata values are limited to 500 chars — keep itemsJson compact
+    const itemsJson = JSON.stringify(items.map(i => ({
+      dishId: i.id,
+      quantity: i.quantity,
+      price: i.price,
+      name: i.name,
+    })));
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -45,22 +61,18 @@ const createCheckoutSession = async (req, res, next) => {
         platformFee: platformFee.toString(),
         gst: gst.toString(),
         total: total.toString(),
-        itemsJson: JSON.stringify(items.map(i => ({
-          dishId: i.id,
-          quantity: i.quantity,
-          price: i.price,
-          name: i.name,
-        }))),
+        itemsJson,
       },
     });
 
     res.json({ url: session.url, sessionId: session.id });
   } catch (err) {
-    next(err);
+    logger.error('Stripe checkout error:', err.message, err.type);
+    return res.status(400).json({ error: err.message || 'Failed to create checkout session' });
   }
 };
 
-const handleWebhook = async (req, res, next) => {
+const handleWebhook = async (req, res) => {
   const sig = req.headers['stripe-signature'];
   let event;
 

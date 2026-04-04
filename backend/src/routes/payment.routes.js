@@ -1,37 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const { createCheckoutSession, handleWebhook, verifySession } = require('../controllers/payment.controller');
+const { authenticate } = require('../middleware/auth');
 
-// Create mock payment intent
-router.post('/create', async (req, res) => {
-  try {
-    console.log('Payment body:', req.body); // debug log
+// Stripe webhook — raw body is applied in server.js before this route
+router.post('/webhook', handleWebhook);
 
-    const { amount, items, total } = req.body;
-
-    // Accept amount or total (Cart sends total)
-    const paymentAmount = amount || total || 0;
-
-    const paymentIntent = {
-      id: `pay_${Date.now()}`,
-      amount: paymentAmount,
-      currency: 'inr',
-      status: 'created',
-    };
-
-    res.json({ success: true, paymentIntent });
-  } catch (err) {
-    res.status(500).json({ error: 'Payment creation failed' });
-  }
-});
-
-// Mock verify payment
-router.post('/verify', async (req, res) => {
-  try {
-    const { paymentId } = req.body;
-    res.json({ success: true, paymentId, status: 'verified' });
-  } catch (err) {
-    res.status(500).json({ error: 'Payment verification failed' });
-  }
-});
+// Authenticated routes
+router.post('/checkout-session', authenticate, createCheckoutSession);
+router.get('/verify/:sessionId', authenticate, verifySession);
 
 module.exports = router;

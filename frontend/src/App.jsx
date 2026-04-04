@@ -15,12 +15,14 @@ import OrderSuccess from './pages/OrderSuccess';
 import AdminDashboard from './pages/Admin';
 
 const ProtectedRoute = ({ children }) => {
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
+  if (authLoading) return null;
   return user ? children : <Navigate to="/login" replace />;
 };
 
 const AdminRoute = ({ children }) => {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, authLoading } = useAuth();
+  if (authLoading) return null;
   if (!user) return <Navigate to="/login" replace />;
   if (!isAdmin) return <Navigate to="/" replace />;
   return children;
